@@ -1,65 +1,131 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase/client'
+
+export default function LoginPage() {
+  const router = useRouter()
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  // 🔒 Verifica se já está logado
+  useEffect(() => {
+    async function checkUser() {
+      const { data } = await supabase.auth.getUser()
+
+      if (data.user) {
+        router.replace('/dashboard')
+      } else {
+        setLoading(false)
+      }
+    }
+
+    checkUser()
+  }, [router])
+
+  async function signIn() {
+    setError(null)
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    })
+
+    if (error) {
+      setError(error.message)
+      return
+    }
+
+    router.replace('/dashboard')
+  }
+
+  async function signUp() {
+    setError(null)
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password
+    })
+
+    if (error) {
+      setError(error.message)
+      return
+    }
+
+    // Funciona se confirmação de email estiver DESATIVADA
+    router.replace('/dashboard')
+  }
+
+  // ⏳ Loading enquanto valida sessão
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-purple-600 text-white">
+        Verificando sessão...
       </main>
-    </div>
-  );
+    )
+  }
+
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center bg-purple-600">
+
+      {/* LOGO */}
+      <div className="mb-8">
+        <Image
+          src="/logo-v2.png"
+          alt="Logo"
+          width={400}
+          height={400}
+          priority
+          className="drop-shadow-xl"
+        />
+      </div>
+
+      {/* BOX LOGIN */}
+      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
+        <h1 className="text-2xl font-bold text-center mb-6 text-purple-600">
+          Entrar
+        </h1>
+
+        <input
+          className="text-purple-600 w-full border rounded-lg px-4 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-purple-400"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+
+        <input
+          type="password"
+          className="text-purple-600 w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-purple-400"
+          placeholder="Senha"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
+
+        <button
+          onClick={signIn}
+          className="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition mb-2"
+        >
+          Entrar
+        </button>
+
+        <button
+          onClick={signUp}
+          className="w-full border border-purple-600 text-purple-600 py-2 rounded-lg hover:bg-purple-50 transition"
+        >
+          Criar conta
+        </button>
+
+        {error && (
+          <p className="text-red-500 text-sm text-center mt-4">
+            {error}
+          </p>
+        )}
+      </div>
+    </main>
+  )
 }
