@@ -55,30 +55,28 @@ export default function DashboardPage() {
         </header>
 
         {/* CARDS */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* OPÇÕES */}
+<section className="grid grid-cols-1 gap-6">
 
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-xl transition cursor-pointer border-t-4 border-purple-600">
-            <h2 className="font-semibold text-purple-600 mb-2">Perfil</h2>
-            <p className="text-purple-400 text-sm">
-              Ver informações da conta
-            </p>
-          </div>
+  <div
+    onClick={() => router.push('/dashboard/battle-pass')}
+    className="cursor-pointer bg-purple-800 text-white p-8 rounded-2xl shadow-lg hover:bg-purple-900 transition flex items-center justify-between"
+  >
+    <div>
+      <h2 className="text-2xl font-bold mb-1">
+        🎟️ Battle Pass
+      </h2>
+      <p className="text-purple-200 text-sm">
+        Progresso, missões e recompensas
+      </p>
+    </div>
 
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-xl transition cursor-pointer border-t-4 border-purple-600">
-            <h2 className="font-semibold text-purple-600 mb-2">Configurações</h2>
-            <p className="text-purple-400 text-sm">
-              Ajustes do sistema
-            </p>
-          </div>
+    <span className="text-3xl">
+      →
+    </span>
+  </div>
 
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-xl transition cursor-pointer border-t-4 border-purple-600">
-            <h2 className="font-semibold text-purple-600 mb-2">Suporte</h2>
-            <p className="text-purple-400 text-sm">
-              Ajuda e contato
-            </p>
-          </div>
-
-        </section>
+</section>
 
         {/* FOOTER */}
         <footer className="mt-10 text-sm text-purple-100 text-center">
